@@ -24,6 +24,12 @@ public class DelaySample {
     @Column(name = "trip_id", nullable = false)
     private String tripId;
 
+    @Column(name = "direction_id", nullable = false)
+    private Integer directionId;
+
+    @Column(name = "schedule_relationship", nullable = false)
+    private String scheduleRelationship;
+
     @Column(name = "delay_seconds", nullable = false)
     private Integer delaySeconds;
 
