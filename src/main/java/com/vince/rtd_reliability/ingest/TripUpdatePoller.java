@@ -41,6 +41,18 @@ public class TripUpdatePoller {
         if (bytes == null || bytes.length == 0) return;
 
         GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(bytes);
+
+        for (GtfsRealtime.FeedEntity entity : feed.getEntityList()) {
+            if (!entity.hasTripUpdate()) continue;
+
+            GtfsRealtime.TripUpdate tripUpdate = entity.getTripUpdate();
+            String tripId = tripUpdate.getTripProperties().getTripId();
+
+            if (!desiredTripIds.contains(tripId)) continue;
+
+
+            log.info("trip update: {}", tripUpdate);
+        }
     }
 
     private byte[] fetchTripUpdatesBytes() {
