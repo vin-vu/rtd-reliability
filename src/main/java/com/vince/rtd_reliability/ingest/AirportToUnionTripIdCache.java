@@ -15,8 +15,7 @@ public class AirportToUnionTripIdCache {
     private static final String UNION_STOP_ID = "34667";
     private final JdbcTemplate jdbcTemplate;
 
-    @Getter
-    private volatile Set<String> cachedTripIds = Set.of();
+    @Getter private volatile Set<String> cachedTripIds = Set.of();
 
     public AirportToUnionTripIdCache(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -43,6 +42,6 @@ public class AirportToUnionTripIdCache {
         List<String> tripIds =
                 jdbcTemplate.queryForList(sql, String.class, AIRPORT_STOP_ID, UNION_STOP_ID);
 
-        cachedTripIds.addAll(tripIds);
+        cachedTripIds = Set.copyOf(tripIds);
     }
 }
