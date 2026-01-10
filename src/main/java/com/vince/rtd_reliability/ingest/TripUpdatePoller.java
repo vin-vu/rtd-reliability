@@ -46,7 +46,7 @@ public class TripUpdatePoller {
             if (!entity.hasTripUpdate()) continue;
 
             GtfsRealtime.TripUpdate tripUpdate = entity.getTripUpdate();
-            String tripId = tripUpdate.getTripProperties().getTripId();
+            String tripId = tripUpdate.getTrip().getTripId();
 
             if (!desiredTripIds.contains(tripId)) continue;
 
