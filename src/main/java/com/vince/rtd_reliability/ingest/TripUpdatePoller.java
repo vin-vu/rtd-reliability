@@ -23,10 +23,10 @@ public class TripUpdatePoller {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final DelaySampleRepository delaySampleRepository;
-    private final UnionTripIdCche tripIdCache;
+    private final UnionTripIdCache tripIdCache;
 
     public TripUpdatePoller(
-            DelaySampleRepository delaySampleRepository, UnionTripIdCche tripIdCache) {
+            DelaySampleRepository delaySampleRepository, UnionTripIdCache tripIdCache) {
         this.delaySampleRepository = delaySampleRepository;
         this.tripIdCache = tripIdCache;
     }

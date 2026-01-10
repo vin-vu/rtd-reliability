@@ -13,19 +13,17 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class UnionTripIdCche {
+public class UnionTripIdCache {
 
     private static final String routeId = "15";
     private static final String stopName = "%union%";
-    private static final String AIRPORT_STOP_ID = "34476";
-    private static final String UNION_STOP_ID = "34667";
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Getter private volatile Set<String> cachedStopIds = Set.of();
     @Getter private volatile Set<String> cachedTripIds = Set.of();
 
-    public UnionTripIdCche(
+    public UnionTripIdCache(
             JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
