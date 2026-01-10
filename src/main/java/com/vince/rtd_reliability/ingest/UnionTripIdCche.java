@@ -34,10 +34,9 @@ public class UnionTripIdCche {
     @PostConstruct
     public void loadOnStartup() {
         refreshStopIds();
-        log.info("cached trip ids: {}", cachedStopIds);
-        //        refreshTrips();
-
         log.info("cached stop ids: {}", cachedStopIds);
+        refreshTrips();
+        log.info("cached trip ids: {}", cachedTripIds);
     }
 
     public void refreshStopIds() {
@@ -58,24 +57,23 @@ public class UnionTripIdCche {
         cachedStopIds = Set.copyOf(stopIds);
     }
 
-    //    public void refreshTrips() {
-    //        String sql =
-    //                """
-    //                SELECT DISTINCT t.trip_id
-    //                FROM gtfs_trips t
-    //                JOIN gtfs_stop_times st ON st.trip_id = t.trip_id
-    //                WHERE t.route_id = :routeId
-    //                  AND st.stop_id IN (:stopIds);
-    //                """;
-    //
-    //        Map<String, Object> params =
-    //                Map.of(
-    //                        "routeId", routeId,
-    //                        "stopIds", cachedStopIds);
-    //
-    //        List<String> tripIds = namedParameterJdbcTemplate.queryForList(sql, params,
-    // String.class);
-    //
-    //        cachedTripIds = Set.copyOf(tripIds);
-    //    }
+    public void refreshTrips() {
+        String sql =
+                """
+                    SELECT DISTINCT t.trip_id
+                    FROM gtfs_trips t
+                    JOIN gtfs_stop_times st ON st.trip_id = t.trip_id
+                    WHERE t.route_id = :routeId
+                      AND st.stop_id IN (:stopIds);
+                    """;
+
+        Map<String, Object> params =
+                Map.of(
+                        "routeId", routeId,
+                        "stopIds", cachedStopIds);
+
+        List<String> tripIds = namedParameterJdbcTemplate.queryForList(sql, params, String.class);
+
+        cachedTripIds = Set.copyOf(tripIds);
+    }
 }
