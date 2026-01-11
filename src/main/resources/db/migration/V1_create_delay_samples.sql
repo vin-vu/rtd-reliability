@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS delay_samples (
   id BIGSERIAL PRIMARY KEY,
-  observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  sampled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   route_id TEXT NOT NULL,
   trip_id TEXT NOT NULL,
   stop_id TEXT NOT NULL,
