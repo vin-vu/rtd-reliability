@@ -10,10 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +22,7 @@ public class TripUpdatePoller {
 
     private static final String TRIP_UPDATES_URL =
             "https://open-data.rtd-denver.com/files/gtfs-rt/rtd/TripUpdate.pb";
+    private static final ZoneId AGENCY_TZ = ZoneId.of("America/Denver");
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final DelaySampleRepository delaySampleRepository;
@@ -77,7 +75,9 @@ public class TripUpdatePoller {
                     if (scheduledArrivalTimeOptional.isEmpty()) continue;
 
                     String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
-                    long scheduledArrivalTimeEpoch = convertToEpochSeconds(scheduledArrivalTime);
+                    long scheduledArrivalTimeEpoch =
+                            gtfsTimeToEpochSeconds(
+                                    scheduledArrivalTime, feed.getHeader().getTimestamp());
                     long rtArrivalTime = stu.getArrival().getTime();
 
                     long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
@@ -113,15 +113,23 @@ public class TripUpdatePoller {
         return response.getBody();
     }
 
-    private long convertToEpochSeconds(String time24hr) {
+    private long gtfsTimeToEpochSeconds(String scheduledTime, long feedTimeStampEpochSec) {
 
-        LocalTime time = LocalTime.parse(time24hr);
+        LocalDate serviceDate =
+                Instant.ofEpochSecond(feedTimeStampEpochSec).atZone(AGENCY_TZ).toLocalDate();
 
-        ZoneId mountain = ZoneId.of("America/Denver");
-        LocalDate today = LocalDate.now(mountain);
+        String[] parts = scheduledTime.split(":");
+        int hour = Integer.parseInt(parts[0]);
+        int minute = Integer.parseInt(parts[1]);
+        int sec = Integer.parseInt(parts[2]);
 
-        ZonedDateTime zdt = ZonedDateTime.of(today, time, mountain);
+        // handle GTFS times go beyond 24:00:00 since working in service days
+        int dayOffset = hour / 24;
+        int hourOfDay = hour % 24;
 
-        return zdt.toEpochSecond();
+        LocalTime localTime = LocalTime.of(hourOfDay, minute, sec);
+        LocalDate localDate = serviceDate.plusDays(dayOffset);
+
+        return ZonedDateTime.of(localDate, localTime, AGENCY_TZ).toEpochSecond();
     }
 }
