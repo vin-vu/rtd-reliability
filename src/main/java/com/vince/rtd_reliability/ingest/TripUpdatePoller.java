@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.vince.rtd_reliability.model.DelaySample;
 import com.vince.rtd_reliability.repository.DelaySampleRepository;
+import com.vince.rtd_reliability.service.GtfsScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
