@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.*;
@@ -99,17 +100,27 @@ public class TripUpdatePoller {
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<byte[]> response =
-                restTemplate.exchange(TRIP_UPDATES_URL, HttpMethod.GET, request, byte[].class);
+        try {
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
+            ResponseEntity<byte[]> response =
+                    restTemplate.exchange(TRIP_UPDATES_URL, HttpMethod.GET, request, byte[].class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.warn(
+                        "Trip Updates request failed: status={} - ur={}",
+                        response.getStatusCode(),
+                        TRIP_UPDATES_URL);
+            }
+
+            return response.getBody();
+
+        } catch (RestClientException e) {
             log.warn(
-                    "Trip Updates request failed: status={} - ur={}",
-                    response.getStatusCode(),
-                    TRIP_UPDATES_URL);
+                    "Trip Updates request failed: url={} error={}",
+                    TRIP_UPDATES_URL,
+                    e.getMessage());
         }
-
-        return response.getBody();
+        return null;
     }
 
     private long gtfsTimeToEpochSeconds(String scheduledTime, long feedTimeStampEpochSec) {
