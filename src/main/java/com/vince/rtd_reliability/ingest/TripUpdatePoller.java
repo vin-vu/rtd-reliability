@@ -78,6 +78,7 @@ public class TripUpdatePoller {
                         gtfsTimeToEpochSeconds(scheduledArrivalTime, rtArrivalTime);
 
                 long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
+                Instant sampledAt = Instant.ofEpochSecond(feed.getHeader().getTimestamp());
 
                 DelaySample sample =
                         new DelaySample(
@@ -85,7 +86,7 @@ public class TripUpdatePoller {
                                 stu.getStopId(),
                                 tripId,
                                 arrivalTimeDelta,
-                                Instant.ofEpochSecond(feed.getHeader().getTimestamp()));
+                                sampledAt);
 
                 samples.add(sample);
 
@@ -96,7 +97,7 @@ public class TripUpdatePoller {
                         arrivalTimeDelta);
             }
         }
-        delaySampleService.saveAll(samples);
+        if (!samples.isEmpty()) delaySampleService.saveAll(samples);
     }
 
     private byte[] fetchTripUpdatesBytes() {
