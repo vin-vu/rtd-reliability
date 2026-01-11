@@ -77,7 +77,7 @@ public class TripUpdatePoller {
                 long scheduledArrivalTimeEpoch =
                         gtfsTimeToEpochSeconds(scheduledArrivalTime, rtArrivalTime);
 
-                long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
+                int arrivalTimeDelta = Math.toIntExact(rtArrivalTime - scheduledArrivalTimeEpoch);
                 Instant sampledAt = Instant.ofEpochSecond(feed.getHeader().getTimestamp());
 
                 DelaySample sample =
