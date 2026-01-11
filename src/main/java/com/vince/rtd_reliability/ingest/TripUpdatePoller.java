@@ -3,7 +3,6 @@ package com.vince.rtd_reliability.ingest;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.vince.rtd_reliability.model.DelaySample;
-import com.vince.rtd_reliability.repository.DelaySampleRepository;
 import com.vince.rtd_reliability.service.DelaySampleService;
 import com.vince.rtd_reliability.service.GtfsScheduleService;
 import lombok.extern.slf4j.Slf4j;
@@ -57,51 +56,44 @@ public class TripUpdatePoller {
             if (!entity.hasTripUpdate()) continue;
 
             GtfsRealtime.TripUpdate tripUpdate = entity.getTripUpdate();
+
+            if (!tripUpdate.hasTrip()) continue;
             String tripId = tripUpdate.getTrip().getTripId();
             if (!desiredTripIds.contains(tripId)) continue;
 
-            List<GtfsRealtime.TripUpdate.StopTimeUpdate> stuList =
-                    tripUpdate.getStopTimeUpdateList();
+            List<GtfsRealtime.TripUpdate.StopTimeUpdate> filteredStuList =
+                    filterStopTimeUpdates(tripUpdate, unionStopIds);
 
-            for (GtfsRealtime.TripUpdate.StopTimeUpdate stu : stuList) {
-                if (stu.getScheduleRelationship()
-                        == GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED)
-                    continue;
+            for (GtfsRealtime.TripUpdate.StopTimeUpdate stu : filteredStuList) {
 
-                if (!stu.hasArrival() || !stu.getArrival().hasTime()) continue;
+                long rtArrivalTime = stu.getArrival().getTime();
 
-                if (unionStopIds.contains(stu.getStopId())) {
+                Optional<String> scheduledArrivalTimeOptional =
+                        gtfsScheduleService.getScheduledArrivalTime(tripId, stu.getStopId());
 
-                    long rtArrivalTime = stu.getArrival().getTime();
+                if (scheduledArrivalTimeOptional.isEmpty()) continue;
+                String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
 
-                    Optional<String> scheduledArrivalTimeOptional =
-                            gtfsScheduleService.getScheduledArrivalTime(tripId, stu.getStopId());
+                long scheduledArrivalTimeEpoch =
+                        gtfsTimeToEpochSeconds(scheduledArrivalTime, rtArrivalTime);
 
-                    if (scheduledArrivalTimeOptional.isEmpty()) continue;
-                    String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
+                long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
 
-                    long scheduledArrivalTimeEpoch =
-                            gtfsTimeToEpochSeconds(scheduledArrivalTime, rtArrivalTime);
+                DelaySample sample =
+                        new DelaySample(
+                                tripUpdate.getTrip().getRouteId(),
+                                stu.getStopId(),
+                                tripId,
+                                arrivalTimeDelta,
+                                Instant.ofEpochSecond(feed.getHeader().getTimestamp()));
 
-                    long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
+                samples.add(sample);
 
-                    DelaySample sample =
-                            new DelaySample(
-                                    tripUpdate.getTrip().getRouteId(),
-                                    stu.getStopId(),
-                                    tripId,
-                                    arrivalTimeDelta,
-                                    Instant.ofEpochSecond(feed.getHeader().getTimestamp()));
-
-                    samples.add(sample);
-
-                    log.info(
-                            "header: {} - trip: {} - stu: {} - delta delay: {}",
-                            feed.getHeader(),
-                            tripUpdate.getTrip(),
-                            stu,
-                            arrivalTimeDelta);
-                }
+                log.info(
+                        "tripId: {} - stopId: {} - delta delay: {}",
+                        tripId,
+                        stu.getStopId(),
+                        arrivalTimeDelta);
             }
         }
         delaySampleService.saveAll(samples);
@@ -133,6 +125,25 @@ public class TripUpdatePoller {
                     e.getMessage());
         }
         return null;
+    }
+
+    private List<GtfsRealtime.TripUpdate.StopTimeUpdate> filterStopTimeUpdates(
+            GtfsRealtime.TripUpdate tripUpdate, Set<String> stopIds) {
+
+        List<GtfsRealtime.TripUpdate.StopTimeUpdate> result = new ArrayList<>();
+
+        for (GtfsRealtime.TripUpdate.StopTimeUpdate stu : tripUpdate.getStopTimeUpdateList()) {
+            if (stu.getScheduleRelationship()
+                    == GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED)
+                continue;
+
+            if (!stu.hasArrival() || !stu.getArrival().hasTime()) continue;
+
+            if (!stopIds.contains(stu.getStopId())) continue;
+
+            result.add(stu);
+        }
+        return result;
     }
 
     private long gtfsTimeToEpochSeconds(String scheduledTime, long feedTimeStampEpochSec) {
