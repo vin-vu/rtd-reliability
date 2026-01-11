@@ -35,6 +35,7 @@ public class TripUpdatePoller {
     public void pollTripUpdates() throws InvalidProtocolBufferException {
 
         Set<String> desiredTripIds = tripIdCache.getCachedTripIds();
+        Set<String> unionStopIds = tripIdCache.getCachedStopIds();
         List<DelaySample> samples = new ArrayList<>();
 
         byte[] bytes = fetchTripUpdatesBytes();
@@ -47,11 +48,28 @@ public class TripUpdatePoller {
 
             GtfsRealtime.TripUpdate tripUpdate = entity.getTripUpdate();
             String tripId = tripUpdate.getTrip().getTripId();
-
             if (!desiredTripIds.contains(tripId)) continue;
 
+            List<GtfsRealtime.TripUpdate.StopTimeUpdate> stuList =
+                    tripUpdate.getStopTimeUpdateList();
 
-            log.info("trip update: {}", tripUpdate);
+            for (GtfsRealtime.TripUpdate.StopTimeUpdate stu : stuList) {
+                if (stu.getScheduleRelationship()
+                        == GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED)
+                    continue;
+
+                if (!stu.getArrival().hasTime()) continue;
+
+                if (unionStopIds.contains(stu.getStopId())) {
+                    log.info(
+                            "header: {} - trip: {} - stu: {} - delay: {} - stu delay: {}",
+                            feed.getHeader(),
+                            tripUpdate.getTrip(),
+                            stu,
+                            tripUpdate.getDelay(),
+                            stu.getArrival().getDelay());
+                }
+            }
         }
     }
 
