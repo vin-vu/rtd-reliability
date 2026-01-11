@@ -69,25 +69,25 @@ public class TripUpdatePoller {
 
                 if (unionStopIds.contains(stu.getStopId())) {
 
+                    long rtArrivalTime = stu.getArrival().getTime();
+
                     Optional<String> scheduledArrivalTimeOptional =
                             gtfsScheduleService.getScheduledArrivalTime(tripId, stu.getStopId());
 
                     if (scheduledArrivalTimeOptional.isEmpty()) continue;
-
                     String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
+
                     long scheduledArrivalTimeEpoch =
                             gtfsTimeToEpochSeconds(
-                                    scheduledArrivalTime, feed.getHeader().getTimestamp());
-                    long rtArrivalTime = stu.getArrival().getTime();
+                                    scheduledArrivalTime, rtArrivalTime);
 
                     long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
 
                     log.info(
-                            "header: {} - trip: {} - stu: {} - delay: {} - delta delay: {}",
+                            "header: {} - trip: {} - stu: {} - delta delay: {}",
                             feed.getHeader(),
                             tripUpdate.getTrip(),
                             stu,
-                            tripUpdate.getDelay(),
                             arrivalTimeDelta);
                 }
             }
