@@ -14,11 +14,11 @@ public interface DelaySampleRepository extends JpaRepository<DelaySample, Long> 
                     """
         SELECT
           COUNT(*) AS total,
-          COUNT(*) FILTER (WHERE delay_seconds < -180) AS early,
-          COUNT(*) FILTER (WHERE delay_seconds BETWEEN -180 AND 180) AS on_time,
-          COUNT(*) FILTER (WHERE delay_seconds > 180) AS late,
+          COUNT(*) FILTER (WHERE delay_seconds < -300) AS early,
+          COUNT(*) FILTER (WHERE delay_seconds BETWEEN -300 AND 300) AS on_time,
+          COUNT(*) FILTER (WHERE delay_seconds > 300) AS late,
           ROUND(
-            100.0 * COUNT(*) FILTER (WHERE delay_seconds BETWEEN -180 AND 180)
+            100.0 * COUNT(*) FILTER (WHERE delay_seconds BETWEEN -300 AND 300)
             / NULLIF(COUNT(*), 0),
             1
           ) AS on_time_pct
