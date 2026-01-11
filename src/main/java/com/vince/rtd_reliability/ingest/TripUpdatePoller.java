@@ -10,6 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -90,5 +94,17 @@ public class TripUpdatePoller {
         }
 
         return response.getBody();
+    }
+
+    private long convertToEpochSeconds(String time24hr) {
+
+        LocalTime time = LocalTime.parse(time24hr);
+
+        ZoneId mountain = ZoneId.of("America/Denver");
+        LocalDate today = LocalDate.now(mountain);
+
+        ZonedDateTime zdt = ZonedDateTime.of(today, time, mountain);
+
+        return zdt.toEpochSecond();
     }
 }
