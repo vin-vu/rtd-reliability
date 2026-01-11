@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.vince.rtd_reliability.model.DelaySample;
 import com.vince.rtd_reliability.repository.DelaySampleRepository;
+import com.vince.rtd_reliability.service.DelaySampleService;
 import com.vince.rtd_reliability.service.GtfsScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -27,15 +28,15 @@ public class TripUpdatePoller {
     private static final ZoneId AGENCY_TZ = ZoneId.of("America/Denver");
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final DelaySampleRepository delaySampleRepository;
+    private final DelaySampleService delaySampleService;
     private final UnionTripIdCache tripIdCache;
     private final GtfsScheduleService gtfsScheduleService;
 
     public TripUpdatePoller(
-            DelaySampleRepository delaySampleRepository,
+            DelaySampleService delaySampleService,
             UnionTripIdCache tripIdCache,
             GtfsScheduleService gtfsScheduleService) {
-        this.delaySampleRepository = delaySampleRepository;
+        this.delaySampleService = delaySampleService;
         this.tripIdCache = tripIdCache;
         this.gtfsScheduleService = gtfsScheduleService;
     }
@@ -92,6 +93,8 @@ public class TripUpdatePoller {
                                     arrivalTimeDelta,
                                     Instant.now());
 
+                    samples.add(sample);
+
                     log.info(
                             "header: {} - trip: {} - stu: {} - delta delay: {}",
                             feed.getHeader(),
@@ -101,6 +104,7 @@ public class TripUpdatePoller {
                 }
             }
         }
+        delaySampleService.saveAll(samples);
     }
 
     private byte[] fetchTripUpdatesBytes() {
