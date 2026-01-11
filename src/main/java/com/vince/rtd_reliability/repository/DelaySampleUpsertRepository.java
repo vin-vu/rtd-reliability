@@ -16,13 +16,13 @@ public interface DelaySampleUpsertRepository extends JpaRepository<DelaySample, 
     @Query(
             value =
                     """
-        INSERT INTO delay_samples (route_id, trip_id, stop_id, delay_seconds, observed_at)
-        VALUES (:routeId, :tripId, :stopId, :delaySeconds, :observedAt)
+        INSERT INTO delay_samples (route_id, trip_id, stop_id, delay_seconds, sampled_At)
+        VALUES (:routeId, :tripId, :stopId, :delaySeconds, :sampledAt)
         ON CONFLICT (trip_id, stop_id)
         DO UPDATE SET
           route_id = EXCLUDED.route_id,
           delay_seconds = EXCLUDED.delay_seconds,
-          observed_at = EXCLUDED.observed_at
+          sampled_at = EXCLUDED.sampled_At
         """,
             nativeQuery = true)
     void upsert(
@@ -30,5 +30,5 @@ public interface DelaySampleUpsertRepository extends JpaRepository<DelaySample, 
             @Param("tripId") String tripId,
             @Param("stopId") String stopId,
             @Param("delaySeconds") int delaySeconds,
-            @Param("observedAt") Instant observedAt);
+            @Param("sampledAt") Instant sampledAt);
 }
