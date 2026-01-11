@@ -83,6 +83,14 @@ public class TripUpdatePoller {
 
                     long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
 
+                    DelaySample sample =
+                            new DelaySample(
+                                    tripUpdate.getTrip().getRouteId(),
+                                    stu.getStopId(),
+                                    tripId,
+                                    arrivalTimeDelta,
+                                    Instant.now());
+
                     log.info(
                             "header: {} - trip: {} - stu: {} - delta delay: {}",
                             feed.getHeader(),
@@ -101,7 +109,6 @@ public class TripUpdatePoller {
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         try {
-
             ResponseEntity<byte[]> response =
                     restTemplate.exchange(TRIP_UPDATES_URL, HttpMethod.GET, request, byte[].class);
 

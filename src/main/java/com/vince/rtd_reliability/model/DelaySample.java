@@ -18,10 +18,12 @@ public class DelaySample {
 
     private String routeId;
     private String tripId;
-    private Integer delaySeconds;
+    private String stopId;
+
+    private long delaySeconds;
     private Instant sampledAt;
 
-    public DelaySample(String routeId, String tripId, Integer delaySeconds, Instant sampledAt) {
+    public DelaySample(String routeId, String tripId, String stopId, long delaySeconds, Instant sampledAt) {
         this.routeId = routeId;
         this.tripId = tripId;
         this.delaySeconds = delaySeconds;
