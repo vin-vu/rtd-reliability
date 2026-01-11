@@ -11,6 +11,10 @@ CREATE TABLE IF NOT EXISTS delay_samples (
   delay_seconds INT
 );
 
+ALTER TABLE delay_samples
+ADD CONSTRAINT IF NOT EXISTS ux_delay_samples_trip_stop
+UNIQUE (trip_id, stop_id);
+
 CREATE INDEX IF NOT EXISTS idx_delay_samples_observed_at
   ON delay_samples(observed_at);
 
