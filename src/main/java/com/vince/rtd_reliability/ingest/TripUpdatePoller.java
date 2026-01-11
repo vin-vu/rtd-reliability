@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -66,16 +67,28 @@ public class TripUpdatePoller {
                         == GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED)
                     continue;
 
-                if (!stu.getArrival().hasTime()) continue;
+                if (!stu.hasArrival() || !stu.getArrival().hasTime()) continue;
 
                 if (unionStopIds.contains(stu.getStopId())) {
+
+                    Optional<String> scheduledArrivalTimeOptional =
+                            gtfsScheduleService.getScheduledArrivalTime(tripId, stu.getStopId());
+
+                    if (scheduledArrivalTimeOptional.isEmpty()) continue;
+
+                    String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
+                    long scheduledArrivalTimeEpoch = convertToEpochSeconds(scheduledArrivalTime);
+                    long rtArrivalTime = stu.getArrival().getTime();
+
+                    long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
+
                     log.info(
-                            "header: {} - trip: {} - stu: {} - delay: {} - stu delay: {}",
+                            "header: {} - trip: {} - stu: {} - delay: {} - delta delay: {}",
                             feed.getHeader(),
                             tripUpdate.getTrip(),
                             stu,
                             tripUpdate.getDelay(),
-                            stu.getArrival().getDelay());
+                            arrivalTimeDelta);
                 }
             }
         }
