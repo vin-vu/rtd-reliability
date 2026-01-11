@@ -1,13 +1,9 @@
 CREATE TABLE IF NOT EXISTS delay_samples (
   id BIGSERIAL PRIMARY KEY,
   observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-
   route_id TEXT NOT NULL,
   trip_id TEXT NOT NULL,
   stop_id TEXT NOT NULL,
-
-  scheduled_arrival_time TEXT,
-  realtime_arrival_epoch BIGINT,
   delay_seconds INT
 );
 
