@@ -83,8 +83,8 @@ public class TripUpdatePoller {
                 DelaySample sample =
                         new DelaySample(
                                 tripUpdate.getTrip().getRouteId(),
-                                stu.getStopId(),
                                 tripId,
+                                stu.getStopId(),
                                 arrivalTimeDelta,
                                 sampledAt);
 
