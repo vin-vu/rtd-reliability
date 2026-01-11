@@ -26,6 +26,7 @@ public class DelaySample {
     public DelaySample(String routeId, String tripId, String stopId, long delaySeconds, Instant sampledAt) {
         this.routeId = routeId;
         this.tripId = tripId;
+        this.stopId = stopId;
         this.delaySeconds = delaySeconds;
         this.sampledAt = sampledAt;
     }

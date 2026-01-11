@@ -91,7 +91,7 @@ public class TripUpdatePoller {
                                     stu.getStopId(),
                                     tripId,
                                     arrivalTimeDelta,
-                                    Instant.now());
+                                    Instant.ofEpochSecond(feed.getHeader().getTimestamp()));
 
                     samples.add(sample);
 
