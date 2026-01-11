@@ -78,8 +78,7 @@ public class TripUpdatePoller {
                     String scheduledArrivalTime = scheduledArrivalTimeOptional.get();
 
                     long scheduledArrivalTimeEpoch =
-                            gtfsTimeToEpochSeconds(
-                                    scheduledArrivalTime, rtArrivalTime);
+                            gtfsTimeToEpochSeconds(scheduledArrivalTime, rtArrivalTime);
 
                     long arrivalTimeDelta = rtArrivalTime - scheduledArrivalTimeEpoch;
 
@@ -105,9 +104,9 @@ public class TripUpdatePoller {
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             log.warn(
-                    "Trip Updates HTTP code {} - message {}",
+                    "Trip Updates request failed: status={} - ur={}",
                     response.getStatusCode(),
-                    request.getBody());
+                    TRIP_UPDATES_URL);
         }
 
         return response.getBody();
