@@ -28,11 +28,15 @@ public class TripUpdatePoller {
     private final RestTemplate restTemplate = new RestTemplate();
     private final DelaySampleRepository delaySampleRepository;
     private final UnionTripIdCache tripIdCache;
+    private final GtfsScheduleService gtfsScheduleService;
 
     public TripUpdatePoller(
-            DelaySampleRepository delaySampleRepository, UnionTripIdCache tripIdCache) {
+            DelaySampleRepository delaySampleRepository,
+            UnionTripIdCache tripIdCache,
+            GtfsScheduleService gtfsScheduleService) {
         this.delaySampleRepository = delaySampleRepository;
         this.tripIdCache = tripIdCache;
+        this.gtfsScheduleService = gtfsScheduleService;
     }
 
     @Scheduled(fixedDelay = 15_000)
