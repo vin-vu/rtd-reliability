@@ -1,0 +1,34 @@
+package com.vince.rtd_reliability.repository;
+
+import com.vince.rtd_reliability.model.DelaySample;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Map;
+
+public interface DelaySampleRepository extends JpaRepository<DelaySample, Long> {
+
+    @Query(
+            value =
+                    """
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE delay_seconds < -180) AS early,
+          COUNT(*) FILTER (WHERE delay_seconds BETWEEN -180 AND 180) AS on_time,
+          COUNT(*) FILTER (WHERE delay_seconds > 180) AS late,
+          ROUND(
+            100.0 * COUNT(*) FILTER (WHERE delay_seconds BETWEEN -180 AND 180)
+            / NULLIF(COUNT(*), 0),
+            1
+          ) AS on_time_pct
+        FROM delay_samples
+        WHERE route_id = :routeId
+          AND stop_id IN (:stopId1, :stopId2)
+        """,
+            nativeQuery = true)
+    Map<String, Object> getOtpLifetime(
+            @Param("routeId") String routeId,
+            @Param("stopId1") String stopId1,
+            @Param("stopId2") String stopId2);
+}
