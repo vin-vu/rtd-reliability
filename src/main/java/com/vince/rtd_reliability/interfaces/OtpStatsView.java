@@ -3,7 +3,7 @@ package com.vince.rtd_reliability.interfaces;
 public interface OtpStatsView {
     long getTotal();
     long getEarly();
-    long onTime();
+    long getOnTime();
     long getLate();
     double getOnTimePct();
 }

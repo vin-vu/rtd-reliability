@@ -1,11 +1,10 @@
 package com.vince.rtd_reliability.repository;
 
+import com.vince.rtd_reliability.interfaces.OtpStatsView;
 import com.vince.rtd_reliability.model.DelaySample;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.Map;
 
 public interface DelaySampleRepository extends JpaRepository<DelaySample, Long> {
 
@@ -27,7 +26,7 @@ public interface DelaySampleRepository extends JpaRepository<DelaySample, Long> 
           AND stop_id IN (:stopId1, :stopId2)
         """,
             nativeQuery = true)
-    Map<String, Object> getOtpLifetime(
+    OtpStatsView getOtpLifetime(
             @Param("routeId") String routeId,
             @Param("stopId1") String stopId1,
             @Param("stopId2") String stopId2);
