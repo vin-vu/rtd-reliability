@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class UnionTripIdCache {
+public class UnionGtfsCache {
 
     @Value("${rtd.route-id}")
     private String routeId;
@@ -28,7 +28,7 @@ public class UnionTripIdCache {
     @Getter private volatile Set<String> cachedStopIds = Set.of();
     @Getter private volatile Set<String> cachedTripIds = Set.of();
 
-    public UnionTripIdCache(
+    public UnionGtfsCache(
             JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

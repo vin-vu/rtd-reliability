@@ -1,6 +1,6 @@
 package com.vince.rtd_reliability.controller;
 
-import com.vince.rtd_reliability.ingest.UnionTripIdCache;
+import com.vince.rtd_reliability.ingest.UnionGtfsCache;
 import com.vince.rtd_reliability.model.OtpStats;
 import com.vince.rtd_reliability.service.DelaySampleService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,17 +18,17 @@ public class RtdReliabilityController {
     private String routeId;
 
     private final DelaySampleService delaySampleService;
-    private final UnionTripIdCache unionTripIdCache;
+    private final UnionGtfsCache unionGtfsCache;
 
     public RtdReliabilityController(
-            DelaySampleService delaySampleService, UnionTripIdCache unionTripIdCache) {
+            DelaySampleService delaySampleService, UnionGtfsCache unionGtfsCache) {
         this.delaySampleService = delaySampleService;
-        this.unionTripIdCache = unionTripIdCache;
+        this.unionGtfsCache = unionGtfsCache;
     }
 
     @GetMapping("/otp-lifetime")
     public ResponseEntity<?> getOtpLifeTime() {
-        List<String> stopIds = new ArrayList<>(unionTripIdCache.getCachedStopIds());
+        List<String> stopIds = new ArrayList<>(unionGtfsCache.getCachedStopIds());
 
         if (stopIds.size() < 2) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)

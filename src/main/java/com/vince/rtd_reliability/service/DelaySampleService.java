@@ -1,10 +1,10 @@
 package com.vince.rtd_reliability.service;
 
-import com.vince.rtd_reliability.interfaces.OtpStatsView;
+import com.vince.rtd_reliability.view.OtpStatsView;
 import com.vince.rtd_reliability.model.DelaySample;
 import com.vince.rtd_reliability.model.OtpStats;
 import com.vince.rtd_reliability.repository.DelaySampleRepository;
-import com.vince.rtd_reliability.repository.DelaySampleUpsertRepository;
+import com.vince.rtd_reliability.repository.DelaySampleWriteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 public class DelaySampleService {
 
-    private final DelaySampleUpsertRepository upsertRepo;
+    private final DelaySampleWriteRepository upsertRepo;
     private final DelaySampleRepository repo;
 
-    public DelaySampleService(DelaySampleUpsertRepository upsertRepo, DelaySampleRepository repo) {
+    public DelaySampleService(DelaySampleWriteRepository upsertRepo, DelaySampleRepository repo) {
         this.upsertRepo = upsertRepo;
         this.repo = repo;
     }

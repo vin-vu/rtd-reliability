@@ -1,6 +1,6 @@
 package com.vince.rtd_reliability.repository;
 
-import com.vince.rtd_reliability.interfaces.OtpStatsView;
+import com.vince.rtd_reliability.view.OtpStatsView;
 import com.vince.rtd_reliability.model.DelaySample;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

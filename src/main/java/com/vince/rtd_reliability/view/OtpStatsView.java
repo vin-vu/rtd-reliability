@@ -1,4 +1,4 @@
-package com.vince.rtd_reliability.interfaces;
+package com.vince.rtd_reliability.view;
 
 public interface OtpStatsView {
     long getTotal();

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-public interface DelaySampleUpsertRepository extends JpaRepository<DelaySample, Long> {
+public interface DelaySampleWriteRepository extends JpaRepository<DelaySample, Long> {
 
     @Modifying
     @Transactional

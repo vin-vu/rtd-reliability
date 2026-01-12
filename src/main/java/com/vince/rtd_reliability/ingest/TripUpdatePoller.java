@@ -28,12 +28,12 @@ public class TripUpdatePoller {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final DelaySampleService delaySampleService;
-    private final UnionTripIdCache tripIdCache;
+    private final UnionGtfsCache tripIdCache;
     private final GtfsScheduleService gtfsScheduleService;
 
     public TripUpdatePoller(
             DelaySampleService delaySampleService,
-            UnionTripIdCache tripIdCache,
+            UnionGtfsCache tripIdCache,
             GtfsScheduleService gtfsScheduleService) {
         this.delaySampleService = delaySampleService;
         this.tripIdCache = tripIdCache;
