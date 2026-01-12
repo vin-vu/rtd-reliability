@@ -3,6 +3,7 @@ package com.vince.rtd_reliability.ingest;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,12 @@ import java.util.Set;
 @Component
 public class UnionTripIdCache {
 
-    private static final String routeId = "15";
-    private static final String stopName = "%union%";
+    @Value("${rtd.route-id}")
+    private String routeId;
+
+    @Value("${rtd.union-stop-name-like}")
+    private String stopName;
+
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
